@@ -1,0 +1,16 @@
+const mongoose = require('mongoose');
+
+const chemistSchema = new mongoose.Schema({
+    shopName: { type: String, required: true },
+    ownerName: { type: String, required: true },
+    address: { type: String, required: true },
+    city: { type: String, required: true },
+    pincode: { type: String, required: true },
+    mobile: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    gstOrPan: { type: String, required: true },
+    status: { type: Boolean, default: false },
+}, { timestamps: true });
+
+module.exports = mongoose.model('Chemist', chemistSchema);
