@@ -4,6 +4,6 @@ const mrController = require('../controller/mr.controller');
 const validations = require('../middlewares/validations');
 const handleValidations = require('../middlewares/handleValidations');
 
-// router.post('/loginMR', validations.loginMR, handleValidations, mrController.loginMR);
+router.post('/loginMR', validations.loginMR, handleValidations, mrController.loginMR);
 
 module.exports = router;
