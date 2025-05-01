@@ -7,6 +7,8 @@ const handleValidations = require('../middlewares/handleValidations');
 routes.post('/registerAdmin', validations.registerAdmin, handleValidations, adminController.registerAdmin);
 routes.post('/loginAdmin', validations.loginAdmin, handleValidations, adminController.loginAdmin);
 
+routes.post('/changePasswordAdmin', validations.jwtValidation, adminController.changePasswordAdmin);
+
 routes.post('/registerMR', validations.jwtValidation, validations.registerMR, handleValidations, adminController.registerMR);
 
 routes.post('/registerStockist', validations.jwtValidation, validations.registerStockist, handleValidations, adminController.registerStockist);

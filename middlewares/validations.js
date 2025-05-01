@@ -128,8 +128,22 @@ const validations = {
     
         check("password").notEmpty().withMessage("Password is required")
             .matches(/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,25}$/)
-            .withMessage("Password must be 8-25 characters and include a digit, lowercase, uppercase, and special character")
-    ],
+            .withMessage("Password must be 8-25 characters and include a digit, lowercase, uppercase, and special character"),
+        
+        check("drugLicenseNumber")
+            .notEmpty().withMessage("Drug License Number is required")
+            .matches(/^[A-Z]{2}-[A-Z]{3}-\d{6}$/).withMessage("Invalid Drug License Number format! It should follow the format: XX-XXX-XXXXXX"),
+        
+        check("refCode")
+            .notEmpty().withMessage("Reference code is required")
+            .custom(async (value) => {
+                const mr = await MR.findOne({ mrCode: value });
+                if (!mr) {
+                    throw new Error("Invalid reference code! No MR found with this code.");
+                }
+                return true;
+            })
+        ],
     loginChemist: [
         check("mobile").notEmpty().withMessage("Mobile number is required")
             .isMobilePhone("any").withMessage("Please enter a valid mobile number")
@@ -238,10 +252,6 @@ const validations = {
                 }
                 return true;
             }),
-
-        // check("password").notEmpty().withMessage("Password is required")
-        //     .matches(/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,25}$/)
-        //     .withMessage("Password must be 8-25 characters and include a digit, lowercase, uppercase, and special character")
     ],
     loginStockist: [
         check("mobile").notEmpty().withMessage("Mobile is required")

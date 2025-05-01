@@ -4,7 +4,11 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 module.exports.registerChemist = async (req, res) => {
     try {
-        let { shopName, ownerName, address, city, pincode, mobile, email, password, gstOrPan } = req.body;
+        let { shopName, ownerName, address, city, pincode, mobile, email, password, gstOrPan, drugLicenseNumber, refCode } = req.body;
+        let drugLicenseImage;
+        if(req.files && req.files.drugLicenseImage){ // if user provide image else default url will be store
+            drugLicenseImage = "/uploads/drugLicense/"+req.files.drugLicenseImage[0].filename;
+        }
         let encryptedPassword = await bcrypt.hash(password, 10);
         let data = {
             shopName: shopName,
@@ -15,8 +19,12 @@ module.exports.registerChemist = async (req, res) => {
             mobile: mobile,
             email: email,
             password: encryptedPassword,
-            gstOrPan: gstOrPan
+            gstOrPan: gstOrPan,
+            drugLicenseNumber: drugLicenseNumber,
+            drugLicenseImage: drugLicenseImage,
+            refCode: refCode,
         };
+        
         let chemistData = await chemist.create(data);
         let message = `
         <div style="font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f4f6f8; padding: 40px;">

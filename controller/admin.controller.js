@@ -39,6 +39,24 @@ module.exports.loginAdmin = async (req, res) => {
     }
 }
 
+module.exports.changePasswordAdmin = async (req, res) => {
+    try {
+        console.log(req.body);
+        let { oldPassword, newPassword } = req.body;
+        let adminData = req.user.toObject();
+        let isMatch = await bcrypt.compare(oldPassword, adminData.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: "Old password is incorrect." });
+        }
+        let encryptedPassword = await bcrypt.hash(newPassword, 10);
+        await admin.updateOne({ _id: adminData._id }, { password: encryptedPassword });
+        return res.status(200).json({ message: "Password changed successfully." });
+    } catch (error) {
+        console.error("Error changing password:", error);
+        return res.status(500).json({ message: "Internal server error." });
+    }
+}
+
 //register for MR
 module.exports.registerMR = async (req, res) => {
     try {

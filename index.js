@@ -18,9 +18,9 @@ app.use(passport.initialize());
 
 app.use('/api/admin', require('./routes/admin.routes'));
 app.use('/api/chemist', require('./routes/chemist.routes'));
-app.use('/api/stockist', require('./routes/stockist.routes'));
 app.use('/api/mr', require('./routes/MR.routes'));
-app.use('/api/salesman', require('./routes/salesman.routes'));
+app.use('/api/stockist', require('./routes/stockist.routes'));
+// app.use('/api/salesman', require('./routes/salesman.routes'));
 
 app.listen(port, (err) => {
     err ? console.log(err) : console.log(`Server is running on port ${port}`);
