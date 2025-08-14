@@ -10,20 +10,21 @@ const mrSchema = new mongoose.Schema({
   mrCode: { type: String, unique: true }
 }, { timestamps: true });
 
-// Hook to auto-generate sequential mrCode
+// Hook to auto-generate random unique 4-digit mrCode
 mrSchema.pre('save', async function (next) {
   if (!this.mrCode) {
-    const lastMr = await mongoose.model('MR').findOne().sort({ createdAt: -1 });
+    let unique = false;
+    let randomCode;
 
-    let nextNumber = 1;
-    if (lastMr?.mrCode) {
-      const lastNumber = parseInt(lastMr.mrCode.replace('MR', ''), 10);
-      if (!isNaN(lastNumber)) {
-        nextNumber = lastNumber + 1;
+    while (!unique) {
+      randomCode = String(Math.floor(1000 + Math.random() * 9000)); // 4-digit number
+      const existing = await mongoose.model('MR').findOne({ mrCode: randomCode });
+      if (!existing) {
+        unique = true;
       }
     }
 
-    this.mrCode = `MR${String(nextNumber).padStart(4, '0')}`;
+    this.mrCode = randomCode;
   }
   next();
 });

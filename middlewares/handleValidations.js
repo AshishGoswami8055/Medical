@@ -17,6 +17,18 @@ const handleValidations = (req, res, next) => {
                     });
                 });
             }
+            if(req.files && req.files.productImage){
+                req.files.productImage.forEach((file) => {
+                    const filePath = file.path;
+                    fs.unlink(filePath, (err) => {
+                        if (err) {
+                            console.error("Error deleting file:", err);
+                        } else {
+                            console.log("File deleted successfully:", filePath);
+                        }
+                    });
+                });
+            }
         } catch (error) {
             console.error("failed to delete the Images" ,error);
         }

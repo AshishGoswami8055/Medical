@@ -96,6 +96,11 @@ const validations = {
         })
     ],
 
+    // category Validations
+    addCategory: [
+        check("categoryName").notEmpty().withMessage("Category Name is required"),
+    ],
+
     // Chemist Registration and Login Validations
     registerChemist: [
         check("shopName").notEmpty().withMessage("Shop Name is required"),
@@ -104,7 +109,7 @@ const validations = {
         check("city").notEmpty().withMessage("City is required"),
         check("pincode").notEmpty().withMessage("Pincode is required"),
         check("gstOrPan").notEmpty().withMessage("GST or PAN is required"),
-    
+
         check("mobile").notEmpty().withMessage("Mobile is required")
             .isMobilePhone("any").withMessage("Invalid mobile number")
             .custom(async (value) => {
@@ -113,27 +118,36 @@ const validations = {
                 }
                 return true;
             }),
-    
+
         check("email").notEmpty().withMessage("Email is required")
             .isEmail().withMessage("Invalid email format")
             .normalizeEmail()
             .custom(async (value) => {
                 console.log("Checking email uniqueness:", value);
-                
+
                 if (!(await isEmailUnique(value))) {
                     throw new Error("Email already exists in the system!");
                 }
                 return true;
             }),
-    
+
         check("password").notEmpty().withMessage("Password is required")
             .matches(/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,25}$/)
             .withMessage("Password must be 8-25 characters and include a digit, lowercase, uppercase, and special character"),
-        
-        check("drugLicenseNumber")
-            .notEmpty().withMessage("Drug License Number is required")
-            .matches(/^[A-Z]{2}-[A-Z]{3}-\d{6}$/).withMessage("Invalid Drug License Number format! It should follow the format: XX-XXX-XXXXXX"),
-        
+
+        // DLN 1
+        check("drugLicenseNumber1")
+            .notEmpty().withMessage("Drug License Number 1 is required")
+            .matches(/^[A-Z]{3}-[A-Z]{3}-(20|21)-\d{1,6}$/)
+            .withMessage("Invalid Drug License Number 1 format! It should follow the format: GUJ-SUR-20-123456"),
+
+        // DLN 2
+        check("drugLicenseNumber2")
+            .notEmpty().withMessage("Drug License Number 2 is required")
+            .matches(/^[A-Z]{3}-[A-Z]{3}-(20|21)-\d{1,6}$/)
+            .withMessage("Invalid Drug License Number 2 format! It should follow the format: GUJ-SUR-20-123456"),
+
+
         check("refCode")
             .notEmpty().withMessage("Reference code is required")
             .custom(async (value) => {
@@ -143,7 +157,7 @@ const validations = {
                 }
                 return true;
             })
-        ],
+    ],
     loginChemist: [
         check("mobile").notEmpty().withMessage("Mobile number is required")
             .isMobilePhone("any").withMessage("Please enter a valid mobile number")
@@ -158,18 +172,18 @@ const validations = {
                 req.chemistUser = chemist;
                 return true;
             }),
-    
+
         check("password").notEmpty().withMessage("Password is required")
             .custom(async (value, { req }) => {
                 if (!req.chemistUser) {
                     throw new Error("No user context found!");
                 }
-    
+
                 const isMatch = await bcrypt.compare(value, req.chemistUser.password);
                 if (!isMatch) {
                     throw new Error("Incorrect password!");
                 }
-    
+
                 return true;
             })
     ],
@@ -277,14 +291,14 @@ const validations = {
     // Salesman Registration and Login Validations
     registerSalesman: [
         check("stockistCode")
-        .notEmpty().withMessage("Stockist code is required")
-        .custom(async (value) => {
-            const stockist = await Stockist.findOne({ stockistCode: value });
-            if (!stockist) {
-                throw new Error("Invalid stockist code. No stockist found with this code!");
-            }
-            return true;
-        }),
+            .notEmpty().withMessage("Stockist code is required")
+            .custom(async (value) => {
+                const stockist = await Stockist.findOne({ stockistCode: value });
+                if (!stockist) {
+                    throw new Error("Invalid stockist code. No stockist found with this code!");
+                }
+                return true;
+            }),
 
         check("name").notEmpty().withMessage("Name is required")
             .isLength({ min: 3 }).withMessage("Name should be at least 3 characters"),
@@ -331,6 +345,8 @@ const validations = {
 
     // jwt validation 
     jwtValidation: passport.authenticate("jwt", { session: false }),
+    jwtValidationChemist: passport.authenticate("chemist-jwt", { session: false }),
+    jwtValidationMR: passport.authenticate("mr-jwt", { session: false }),
 }
 
 module.exports = validations;

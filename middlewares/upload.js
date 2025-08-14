@@ -23,7 +23,7 @@ const uploadImage = (imgType, fields = []) => {
     }).fields(fields)
 }
 const checkFileType = (file, cb)=>{
-    let allowedFileTypes = /jpeg|jpg|png|gif/;
+    let allowedFileTypes = /jpeg|jpg|png/;
     let extname = allowedFileTypes.test(path.extname(file.originalname).toLowerCase());
     let mimetype = allowedFileTypes.test(file.mimetype);
 
