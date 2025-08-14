@@ -4,7 +4,7 @@ const MR = require('../models/MR.model');
 const Stockist = require('../models/stockist.model');
 const Salesman = require('../models/saleman.model');
 const Chemist = require('../models/chemist.model');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const passport = require("passport");
 
 // Helper: check if mobile exists in any collection
