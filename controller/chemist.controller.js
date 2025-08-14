@@ -5,7 +5,7 @@ const chemist = require("../models/chemist.model");
 const productModel = require("../models/product.model");
 const product = require("../models/product.model");
 const mail = require("../services/mail");
-const bcrypt = require("bcrypt");
+const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
 
 module.exports.registerChemist = async (req, res) => {

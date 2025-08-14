@@ -5,7 +5,7 @@ const product = require("../models/product.model");
 const chemistModel = require("../models/chemist.model");
 const Cart = require("../models/cart.model");
 const { default: mongoose } = require("mongoose");
-const bcrypt = require("bcrypt");
+const bcrypt = require('bcryptjs');
 
 module.exports.loginMR = async (req, res) => {
     try {
