@@ -7,6 +7,21 @@ const product = require("../models/product.model");
 const mail = require("../services/mail");
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
+const Chemist = require("../models/chemist.model");
+const Stockist = require("../models/stockist.model");
+const Salesman = require("../models/saleman.model");
+const admin = require("../models/admin.model");
+
+// utility: search across all collections
+const findInCollections = async (query) => {
+  return Promise.all([
+    MR.findOne(query).lean(),
+    Stockist.findOne(query).lean(),
+    Chemist.findOne(query).lean(),
+    Salesman.findOne(query).lean(),
+    admin.findOne(query).lean(),
+  ]);
+};
 
 module.exports.registerChemist = async (req, res) => {
   try {
@@ -256,4 +271,45 @@ exports.checkMrcode = async (req, res) => {
     return res.status(500).json({ message: "Internal server error", success: false });
   }
 };
-  
+
+exports.verifyUnique = async (req, res) => {
+  try {
+    const { mobile, email } = req.query;
+
+    if (!mobile && !email) {
+      return res.status(400).json({
+        success: false,
+        message: "Either mobile or email is required",
+      });
+    }
+
+    let results;
+    if (mobile) {
+      // Admin uses `phone` instead of `mobile`
+      results = await Promise.all([
+        ...await findInCollections({ mobile }),
+        await admin.findOne({ phone: mobile }).lean(),
+      ]);
+    } else if (email) {
+      results = await findInCollections({ email });
+    }
+
+    const isUnique = results.every((r) => !r);
+
+    return res.status(200).json({
+      success: true, // ✅ always true if query was valid
+      type: mobile ? "mobile" : "email",
+      value: mobile || email,
+      isUnique,
+      message: isUnique
+        ? `${mobile ? "Mobile" : "Email"} is available`
+        : `${mobile ? "Mobile" : "Email"} already exists`,
+    });
+  } catch (error) {
+    console.error("verifyUnique error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}

@@ -23,6 +23,9 @@ router.get('/getProduct/:productId', chemistController.getProduct);
 router.get("/getSingleProduct/:productName", chemistController.getSingleProduct);
 
 
+// verify Mobile and Email
+router.get('/verify-unique', chemistController.verifyUnique);
+
 // mrcode checking 
 router.get('/checkMrcode/:mrcode', chemistController.checkMrcode);
 
