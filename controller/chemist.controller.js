@@ -11,7 +11,7 @@ const Chemist = require("../models/chemist.model");
 const Stockist = require("../models/stockist.model");
 const Salesman = require("../models/saleman.model");
 const admin = require("../models/admin.model");
-
+const SECRET = process.env.JWT_SECRET
 // utility: search across all collections
 const findInCollections = async (query) => {
   return Promise.all([
@@ -313,3 +313,57 @@ exports.verifyUnique = async (req, res) => {
     });
   }
 }
+
+exports.sendOTP = async (req, res) => {
+  try {
+    const { email } = req.body; // use body, not query for POST
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email is required" });
+    }
+
+    // 1. Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // 2. Create JWT with OTP + email + expiry
+    const token = jwt.sign(
+      { email, otp },
+      SECRET,
+      { expiresIn: "5m" } // OTP valid for 5 minutes
+    );
+
+    // 3. Send OTP to email
+    await mail(email, "OTP Verification", `Your OTP is ${otp}`);
+
+    // 4. Return token (NOT the OTP)
+    return res.status(200).json({
+      success: true,
+      message: `OTP sent to ${email}`,
+      token, // frontend must keep this hidden
+    });
+  } catch (error) {
+    console.error("sendOTP error:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+
+exports.verifyOTP = async (req, res) => {
+  try {
+    const { email, otp, token } = req.body;
+    if (!email || !otp || !token) {
+      return res.status(400).json({ success: false, message: "Email, OTP, and token are required" });
+    }
+
+    // Decode token
+    const decoded = jwt.verify(token, SECRET);
+
+    // Compare
+    if (decoded.email === email && decoded.otp === otp) {
+      return res.status(200).json({ success: true, message: "OTP verified" });
+    } else {
+      return res.status(400).json({ success: false, message: "Invalid OTP" });
+    }
+  } catch (error) {
+    return res.status(400).json({ success: false, message: "OTP expired or invalid" });
+  }
+};
