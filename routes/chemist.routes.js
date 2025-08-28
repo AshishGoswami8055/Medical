@@ -27,7 +27,7 @@ router.get("/getSingleProduct/:productName", chemistController.getSingleProduct)
 router.get('/verify-unique', chemistController.verifyUnique);
 
 // otp 
-router.get('/sendOTP', chemistController.sendOTP);
+router.post('/sendOTP', chemistController.sendOTP);
 
 // mrcode checking 
 router.get('/checkMrcode/:mrcode', chemistController.checkMrcode);
